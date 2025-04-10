@@ -37,46 +37,70 @@ def main(page: ft.Page):
                 ft.Container(height=20),  # spazio
                 prodottiContainer  # contenitore
             ],
-            spacing=0
+            spacing=0,
+            alignment=ft.MainAxisAlignment.CENTER,
         )
         
         page.controls.clear()
         page.add(vendita)
         
         # dizionario prodotti
+        prodotti=dict()
+        caricaProdotti("prodotti.txt",prodotti)
+
+        """
         prodotti = {
             "Acqua naturale": [1.50, 5],
             "Acqua frizzante": [1.60, 3],
             "Cola": [2.00, 10]
         }
+        """
         
-        # Crea una riga di prodotti
-        row = ft.Row(wrap=True, spacing=10)
+        # Crea una riga di prodotti con wrap e allineamento centrale
+        row = ft.Row(
+            wrap=True, 
+            spacing=20,
+            alignment=ft.MainAxisAlignment.CENTER,
+            vertical_alignment=ft.CrossAxisAlignment.CENTER
+        )
         
         # Aggiungi i prodotti alla riga
         for p, info in prodotti.items():
             row.controls.append(ft.Container(
                 content=ft.Column([
                     ft.Text(value=p, size=16, weight="bold"),
-                    ft.Text(f"€{info[0]:.2f}", size=14),
+                    ft.Text(f"€{info[0]}", size=14),
                     ft.Text(f"Disponibili: {info[1]}", size=12)
-                ], 
-                alignment=ft.MainAxisAlignment.CENTER, spacing=5),
-                alignment=ft.alignment.center,
+                ], alignment=ft.MainAxisAlignment.CENTER, spacing=5),
                 height=200,
                 width=200,
                 bgcolor="indigo100",
-                border_radius=5,
+                border_radius=10,
+                margin=10,
+                alignment=ft.alignment.center,
                 on_click=lambda e, prod=p, prezzo=info[0]: seleziona_prodotto(e, prod, prezzo)
             ))
         
-        # Aggiungi la riga al contenitore
-        prodottiContainer.controls.append(row)
+        # Aggiungi la riga al contenitore centrato
+        prodottiContainer.controls.append(ft.Container(
+            content=row,
+            alignment=ft.alignment.center,
+            expand=True
+        ))
         page.update()
+
+    def caricaProdotti(filename,dictProdotti):
+        dati=open(filename,"r")
+        
+        for r in dati:
+            r=r.strip()
+            p=r.split("|")
+            dictProdotti[p[0]]=[p[1],p[2]]
+
 
     def seleziona_prodotto(e, prodotto, prezzo):
         # Funzione chiamata quando un prodotto viene selezionato
-        snackBar = ft.SnackBar(content=ft.Text(f"Selezionato: {prodotto} - €{prezzo:.2f}"))
+        snackBar = ft.SnackBar(content=ft.Text(f"Selezionato: {prodotto} - €{prezzo}"))
         page.open(snackBar)
         page.update()
 
