@@ -5,27 +5,94 @@ def main(page: ft.Page):
     page.vertical_alignment = ft.MainAxisAlignment.CENTER
     page.horizontal_alignment = ft.CrossAxisAlignment.CENTER
     
-    # PIN per l'inizializzazione vendite
-    PIN_VENDITE = "1789"
+    # VAR
+    PIN_VENDITE = "0000"
+    credito=0.0
     
     # Funzione per verificare il PIN
     def pinAccesso(e):
         if tbPin.value == PIN_VENDITE:
             page.close(pinDialog)
+            page.controls.clear()
+            venditaProdotti(e)
             page.update()
         else:
             tbPin.error_text = "PIN non valido."
             tbPin.value = ""
             page.update()
     
-    # Funzione per aprire il dialog del PIN
+    def venditaProdotti(e):
+        # contenitore principale vuoto
+        prodottiContainer = ft.Column(spacing=10)
+        
+        vendita = ft.Column(
+            [
+                ft.Container(
+                    content=ft.Text("Seleziona prodotto", weight="bold", size=40),
+                    alignment=ft.alignment.center,
+                    margin=0,
+                    padding=0,
+                    width=page.width
+                ),
+                ft.Container(height=20),  # spazio
+                prodottiContainer  # contenitore
+            ],
+            spacing=0
+        )
+        
+        page.controls.clear()
+        page.add(vendita)
+        
+        # dizionario prodotti
+        prodotti = {
+            "Acqua naturale": [1.50, 5],
+            "Acqua frizzante": [1.60, 3],
+            "Cola": [2.00, 10]
+        }
+        
+        # Crea una riga di prodotti
+        row = ft.Row(wrap=True, spacing=10)
+        
+        # Aggiungi i prodotti alla riga
+        for p, info in prodotti.items():
+            row.controls.append(ft.Container(
+                content=ft.Column([
+                    ft.Text(value=p, size=16, weight="bold"),
+                    ft.Text(f"€{info[0]:.2f}", size=14),
+                    ft.Text(f"Disponibili: {info[1]}", size=12)
+                ], 
+                alignment=ft.MainAxisAlignment.CENTER, spacing=5),
+                alignment=ft.alignment.center,
+                height=200,
+                width=200,
+                bgcolor="indigo100",
+                border_radius=5,
+                on_click=lambda e, prod=p, prezzo=info[0]: seleziona_prodotto(e, prod, prezzo)
+            ))
+        
+        # Aggiungi la riga al contenitore
+        prodottiContainer.controls.append(row)
+        page.update()
+
+    def seleziona_prodotto(e, prodotto, prezzo):
+        # Funzione chiamata quando un prodotto viene selezionato
+        snackBar = ft.SnackBar(content=ft.Text(f"Selezionato: {prodotto} - €{prezzo:.2f}"))
+        page.open(snackBar)
+        page.update()
+
+    # Funzione click inizializza
     def inizializza(e):
         tbPin.value = ""
         page.open(pinDialog)
         page.update()
     
     # Dialog per l'inserimento del PIN
-    tbPin = ft.TextField(label="Inserisci PIN", password=True, width=300)
+    tbPin = ft.TextField(
+        label="Inserisci PIN", 
+        password=True, 
+        width=300,
+        on_submit=pinAccesso,  # tasto invio
+    )
     
     pinDialog = ft.AlertDialog(
         modal=True,
@@ -73,7 +140,7 @@ def main(page: ft.Page):
                     height=100,
                     on_click=loginOperatore,
                     style=ft.ButtonStyle(
-                        color=ft.colors.WHITE,
+                        color="WHITE",
                         bgcolor=ft.colors.RED_700,
                         elevation=10,
                         
