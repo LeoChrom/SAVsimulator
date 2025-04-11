@@ -20,7 +20,8 @@ def main(page: ft.Page):
     def navigaMenu(e):
         index = e.control.selected_index
         if index==0:
-            pass
+            global schermata #temporaneo
+            schermata=0
         elif index==1:
             inizializza(e)
         elif index==2:
