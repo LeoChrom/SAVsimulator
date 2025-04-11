@@ -29,7 +29,7 @@ def main(page: ft.Page):
             [
                 ft.Container(
                     content=ft.Text("Seleziona prodotto", weight="bold", size=40),
-                    alignment=ft.alignment.center,
+                    alignment=ft.Alignment(0,1),
                     margin=0,
                     padding=0,
                     width=page.width
@@ -38,11 +38,16 @@ def main(page: ft.Page):
                 prodottiContainer  # contenitore
             ],
             spacing=0,
-            alignment=ft.MainAxisAlignment.CENTER,
+        )
+
+        scrollCont=ft.ListView(
+            [vendita],
+            expand=True
+
         )
         
         page.controls.clear()
-        page.add(vendita)
+        page.add(scrollCont)
         
         # dizionario prodotti
         prodotti=dict()
