@@ -1,5 +1,7 @@
 import flet as ft
 
+schermata=0 #indicatore pagina
+
 def main(page: ft.Page):
     page.title = "SAV simulator"
     page.vertical_alignment = ft.MainAxisAlignment.CENTER
@@ -11,7 +13,8 @@ def main(page: ft.Page):
     # Funzione click inizializza vendite
     def inizializza(e):
         tbPin.value = ""
-        page.open(pinDialog)
+        if schermata!=1: #la schermata home non ha container
+            page.open(pinDialog)
         page.update()
 
     def navigaMenu(e):
@@ -36,6 +39,8 @@ def main(page: ft.Page):
             dictProdotti[p[0]]=[p[1],p[2]]
 
     def venditaProdotti(e):
+        global schermata
+        schermata=1
         # contenitore principale prodotti vuoto
         prodottiContainer = ft.Column(spacing=10)
         
@@ -55,7 +60,6 @@ def main(page: ft.Page):
         )
 
         #cambio schermata
-        mainContainer.content.clean()
         mainContainer.content=vendita
         page.update()
         
