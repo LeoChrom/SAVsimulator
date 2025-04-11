@@ -13,7 +13,7 @@ def main(page: ft.Page):
     # Funzione click inizializza vendite
     def inizializza(e):
         tbPin.value = ""
-        if schermata!=1: #la schermata home non ha container
+        if schermata!=1: #se è gia selezionato non chiedi pin
             page.open(pinDialog)
         page.update()
 
