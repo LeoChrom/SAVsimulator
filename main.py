@@ -13,7 +13,6 @@ def main(page: ft.Page):
     def pinAccesso(e):
         if tbPin.value == PIN_VENDITE:
             page.close(pinDialog)
-            page.controls.clear()
             venditaProdotti(e)
             page.update()
         else:
@@ -22,7 +21,7 @@ def main(page: ft.Page):
             page.update()
     
     def venditaProdotti(e):
-        # contenitore principale vuoto
+        # contenitore principale prodotti vuoto
         prodottiContainer = ft.Column(spacing=10)
         
         vendita = ft.Column(
@@ -35,19 +34,15 @@ def main(page: ft.Page):
                     width=page.width
                 ),
                 ft.Container(height=20),  # spazio
-                prodottiContainer  # contenitore
+                prodottiContainer  # contenitore prodotti
             ],
             spacing=0,
         )
 
-        scrollCont=ft.ListView(
-            [vendita],
-            expand=True
 
-        )
-        
-        page.controls.clear()
-        page.add(scrollCont)
+        mainContainer.content.clean()
+        mainContainer.content=vendita
+        page.update()
         
         # dizionario prodotti
         prodotti=dict()
@@ -83,7 +78,7 @@ def main(page: ft.Page):
                 border_radius=10,
                 margin=10,
                 alignment=ft.alignment.center,
-                on_click=lambda e, prod=p, prezzo=info[0]: seleziona_prodotto(e, prod, prezzo)
+                on_click=lambda e, prod=p, prezzo=info[0]: selProdotto(e, prod, prezzo)
             ))
         
         # Aggiungi la riga al contenitore centrato
@@ -103,8 +98,8 @@ def main(page: ft.Page):
             dictProdotti[p[0]]=[p[1],p[2]]
 
 
-    def seleziona_prodotto(e, prodotto, prezzo):
-        # Funzione chiamata quando un prodotto viene selezionato
+    def selProdotto(e, prodotto, prezzo):
+        # un prodotto viene selezionato
         snackBar = ft.SnackBar(content=ft.Text(f"Selezionato: {prodotto} - €{prezzo}"))
         page.open(snackBar)
         page.update()
@@ -140,6 +135,7 @@ def main(page: ft.Page):
     def loginOperatore(e):
         pass
 
+    # Start screen
     start = ft.Column(
         [
             ft.Row(
@@ -182,6 +178,15 @@ def main(page: ft.Page):
         spacing=0
     )
 
-    page.add(start)
+    mainContainer= ft.Container(
+        content=start
+    )
+
+    mainScroll=ft.ListView(
+            [mainContainer],
+            expand=True
+        )
+
+    page.add(mainScroll)
 
 ft.app(main)
