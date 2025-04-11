@@ -4,22 +4,37 @@ def main(page: ft.Page):
     page.title = "SAV simulator"
     page.vertical_alignment = ft.MainAxisAlignment.CENTER
     page.horizontal_alignment = ft.CrossAxisAlignment.CENTER
+
     
-    # VAR
-    PIN_VENDITE = "0000"
-    credito=0.0
-    
-    # Funzione per verificare il PIN
-    def pinAccesso(e):
-        if tbPin.value == PIN_VENDITE:
-            page.close(pinDialog)
-            venditaProdotti(e)
-            page.update()
-        else:
-            tbPin.error_text = "PIN non valido."
-            tbPin.value = ""
-            page.update()
-    
+    """___Gestione eventi___"""
+
+    # Funzione click inizializza vendite
+    def inizializza(e):
+        tbPin.value = ""
+        page.open(pinDialog)
+        page.update()
+
+    def navigaMenu(e):
+        index = e.control.selected_index
+        if index==0:
+            pass
+        elif index==1:
+            inizializza(e)
+        elif index==2:
+            pass
+
+        page.update()
+
+
+
+    def caricaProdotti(filename,dictProdotti):
+        dati=open(filename,"r")
+        
+        for r in dati:
+            r=r.strip()
+            p=r.split("|")
+            dictProdotti[p[0]]=[p[1],p[2]]
+
     def venditaProdotti(e):
         # contenitore principale prodotti vuoto
         prodottiContainer = ft.Column(spacing=10)
@@ -39,7 +54,7 @@ def main(page: ft.Page):
             spacing=0,
         )
 
-
+        #cambio schermata
         mainContainer.content.clean()
         mainContainer.content=vendita
         page.update()
@@ -89,33 +104,33 @@ def main(page: ft.Page):
         ))
         page.update()
 
-    def caricaProdotti(filename,dictProdotti):
-        dati=open(filename,"r")
-        
-        for r in dati:
-            r=r.strip()
-            p=r.split("|")
-            dictProdotti[p[0]]=[p[1],p[2]]
-
-
     def selProdotto(e, prodotto, prezzo):
         # un prodotto viene selezionato
         snackBar = ft.SnackBar(content=ft.Text(f"Selezionato: {prodotto} - €{prezzo}"))
         page.open(snackBar)
         page.update()
-
-    # Funzione click inizializza
-    def inizializza(e):
-        tbPin.value = ""
-        page.open(pinDialog)
-        page.update()
     
-    # Dialog per l'inserimento del PIN
+    def pinAccessoVendite(e):
+        """Funzione per verificare il PIN"""
+        if tbPin.value == PIN_VENDITE:
+            page.close(pinDialog)
+            venditaProdotti(e)
+            page.update()
+        else:
+            tbPin.error_text = "PIN non valido."
+            tbPin.value = ""
+            page.update()
+    
+    def loginOperatore(e):
+        pass
+
+    """--- Controlli e variabili ---"""
+
     tbPin = ft.TextField(
         label="Inserisci PIN", 
         password=True, 
         width=300,
-        on_submit=pinAccesso,  # tasto invio
+        on_submit=pinAccessoVendite,  # tasto invio
     )
     
     pinDialog = ft.AlertDialog(
@@ -127,13 +142,13 @@ def main(page: ft.Page):
         ], tight=True, spacing=20, width=300),
         actions=[
             ft.ElevatedButton("Annulla", on_click=lambda e: page.close(pinDialog)),
-            ft.ElevatedButton("Conferma", on_click=pinAccesso)
+            ft.ElevatedButton("Conferma", on_click=pinAccessoVendite)
         ],
         actions_alignment=ft.MainAxisAlignment.END
     )
     
-    def loginOperatore(e):
-        pass
+    PIN_VENDITE = "0000"
+    credito=0.0
 
     # Start screen
     start = ft.Column(
@@ -178,6 +193,15 @@ def main(page: ft.Page):
         spacing=0
     )
 
+    navbar = ft.NavigationBar(
+        destinations=[
+            ft.NavigationBarDestination(icon="HOME_OUTLINED", selected_icon="HOME_FILLED", label="Start"),
+            ft.NavigationBarDestination(icon="SELL", label="Vendite"),
+            ft.NavigationBarDestination(icon="BOOKMARK_BORDER", selected_icon="BOOKMARK", label="Explore",),
+        ],
+        on_change=navigaMenu
+    )
+
     mainContainer= ft.Container(
         content=start
     )
@@ -187,6 +211,12 @@ def main(page: ft.Page):
             expand=True
         )
 
+
+
+    page.navigation_bar = navbar
     page.add(mainScroll)
+    
+    # posiziona navbar
+    
 
 ft.app(main)
